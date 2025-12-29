@@ -1,0 +1,9 @@
+langchain
+langchain-openai
+langchain-anthropic
+langchain-community
+pydantic
+pandas
+pypdf
+openpyxl
+python-dotenv

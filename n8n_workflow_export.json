@@ -1,0 +1,334 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        -240
+      ],
+      "id": "fe267ca4-2d42-48e4-b310-f43fa4c7b20e",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "1vz9Ttg5QVi_HZna__aIeEIygKhkVIyHs"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -320,
+        -240
+      ],
+      "id": "73f1d434-36d8-4db2-ae59-c33dce0109ec",
+      "name": "List PDFs from Drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yeOrhUbaojkoyty3",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{$json.id}}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -128,
+        -240
+      ],
+      "id": "c9f9a78d-87e2-4793-9bb4-65d8c7027a1e",
+      "name": "Download PDF",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "yeOrhUbaojkoyty3",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        32,
+        -240
+      ],
+      "id": "e3a377dd-b01e-4b37-9c06-9112a3f98b2a",
+      "name": "Extract Text from PDF"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "claude-3-5-haiku-20241022",
+          "mode": "list",
+          "cachedResultName": "claude-3-5-haiku-20241022"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an information extraction agent.\n\nExtract structured invoice data from the text below.\n\nReturn ONLY valid JSON.\nNo explanations.\nNo markdown.\nNo comments.\nNo trailing text.\n\nThe response MUST:\n- start with {\n- end with }\n- be valid JSON parsable by JSON.parse\n\nRequired fields:\n- company (string)\n- invoice_number (string)\n- invoice_date (string, ISO format if possible)\n- total_amount (number)\n- currency (string)\n- bill_to (string)\n- line_items (array of objects with:\n  - description (string)\n  - quantity (number)\n  - rate (number)\n  - amount (number)\n)\n\nIf a field is missing, return null (do not omit fields).\n\nInvoice text:\n{{ $json.text }}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "typeVersion": 1,
+      "position": [
+        224,
+        -240
+      ],
+      "id": "5fafea1f-f751-41d6-8557-f85540302a98",
+      "name": "Extract Invoice JSON (LLM)",
+      "credentials": {
+        "anthropicApi": {
+          "id": "CLtJQNCeeojzoATP",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ JSON.parse($json.content[0].text) }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        528,
+        -240
+      ],
+      "id": "6efdb8cf-a2a9-4853-b1c4-fd235d021685",
+      "name": "Parse LLM JSON"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "line_items",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -496,
+        48
+      ],
+      "id": "f81ef7c8-c0ee-4038-8de5-3d91ceed7692",
+      "name": "Split Line Items"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1e8aefe-7b8d-47aa-aaa9-307f1bbd242a",
+              "name": "vendor_name",
+              "value": "={{$json.company}}",
+              "type": "string"
+            },
+            {
+              "id": "6b3957ca-7bd8-400b-aae6-f7a12f795693",
+              "name": "invoice_number",
+              "value": "={{$json.invoice_number}}",
+              "type": "string"
+            },
+            {
+              "id": "dd06607f-760e-40eb-865d-1a2f07b3b54c",
+              "name": "invoice_date",
+              "value": "={{$json.invoice_date}}",
+              "type": "string"
+            },
+            {
+              "id": "ed31bdcf-07eb-462d-a6b0-fef0779068e3",
+              "name": "currency",
+              "value": "={{$json.currency}}",
+              "type": "string"
+            },
+            {
+              "id": "fadf8bc1-a780-4a03-aa64-89ce2214249e",
+              "name": "bill_to",
+              "value": "={{$json.bill_to}}",
+              "type": "string"
+            },
+            {
+              "id": "b2bb8200-05b8-4397-b00a-674dce41afc3",
+              "name": "description",
+              "value": "={{$json.line_items.description}}",
+              "type": "string"
+            },
+            {
+              "id": "d400f526-d0a7-4ddb-818f-280f858d9a61",
+              "name": "quantity",
+              "value": "={{$json.line_items.quantity}}",
+              "type": "number"
+            },
+            {
+              "id": "c90daaa8-7a1b-41ab-aed3-d927249365ba",
+              "name": "rate",
+              "value": "={{$json.line_items.rate}}",
+              "type": "number"
+            },
+            {
+              "id": "8c42d3d3-b52c-4951-8337-85c9666fc43b",
+              "name": "amount",
+              "value": "={{$json.line_items.amount}}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        48
+      ],
+      "id": "4ae23556-283e-4b1f-95e7-b2023eb1beff",
+      "name": "Flatten Invoice Rows"
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -128,
+        48
+      ],
+      "id": "a01f077f-7bc8-4943-8927-73952eeb15eb",
+      "name": "Export to Excel"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "List PDFs from Drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List PDFs from Drive": {
+      "main": [
+        [
+          {
+            "node": "Download PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download PDF": {
+      "main": [
+        [
+          {
+            "node": "Extract Text from PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Text from PDF": {
+      "main": [
+        [
+          {
+            "node": "Extract Invoice JSON (LLM)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Invoice JSON (LLM)": {
+      "main": [
+        [
+          {
+            "node": "Parse LLM JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse LLM JSON": {
+      "main": [
+        [
+          {
+            "node": "Split Line Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Line Items": {
+      "main": [
+        [
+          {
+            "node": "Flatten Invoice Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flatten Invoice Rows": {
+      "main": [
+        [
+          {
+            "node": "Export to Excel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "14c563e8-5930-4e43-9d62-97311b00f632",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "af72e6cf82e2e4c91802ddb9db918e1254dac919584422f824191a7e6c040a10"
+  },
+  "id": "LavADhmU32lqwvRe",
+  "tags": []
+}
