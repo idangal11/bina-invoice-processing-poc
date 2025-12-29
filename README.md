@@ -83,7 +83,7 @@ AI support was used for:
 * Designing and refining the Pydantic schema
 * Structuring the memory bank logic
 * Improving code clarity and modularity
-* 
+
 ---
 
 ## Graphical User Interface (GUI)
