@@ -142,9 +142,14 @@ ANTHROPIC_API_KEY=YOUR_ANTHROPIC_API_KEY_HERE
 
 ---
 
-## Final Notes
-Both approaches are valid and production-capable.  
-The choice depends on project constraints, team skills, and long-term maintenance considerations.
+**My Experience & When I Would Choose Each Approach**
+
+* **n8n** – I would choose this approach for a **fast POC**, clear business automation workflows, or when the solution needs to be **easy to understand and maintain by non-technical teams**. Its main strengths are rapid development, visual transparency, and quick integration with existing systems.
+
+* **LangChain (Code-First)** – I would choose this approach when **complex logic**, **strict schema enforcement**, or **advanced memory mechanisms** are required, or when the system is intended for **long-term, production-grade scalability**. This approach provides full control, strong validation, and greater extensibility.
+
+**In practice:** n8n is best suited for *automation and business workflows*, while LangChain is better suited for *complex, scalable AI production systems*.
+
 
 ## Additional Documentation
 
