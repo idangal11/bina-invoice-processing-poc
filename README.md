@@ -1,4 +1,4 @@
-# Bina Project – Invoice Processing System
+# Bina Labs Project – Invoice Processing System
 
 ## Overview
 This project demonstrates two different approaches for extracting structured invoice data from PDF files and exporting the results to Excel:
