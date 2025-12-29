@@ -74,7 +74,16 @@ It emphasizes flexibility, advanced logic, and extensibility.
 pip install -r requirements.txt
 python main.py
 ```
+### AI-Assisted Development
 
+This project was developed using **AI-assisted coding tools (Cursor / VS Code)**.
+AI support was used for:
+
+* Rapid iteration on LangChain pipelines
+* Designing and refining the Pydantic schema
+* Structuring the memory bank logic
+* Improving code clarity and modularity
+* 
 ---
 
 ## Graphical User Interface (GUI)
